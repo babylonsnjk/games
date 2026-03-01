@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Games</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 24px;
+    }
+    h1 {
+      font-size: 2rem;
+      letter-spacing: 4px;
+      color: #fff;
+    }
+    .games {
+      display: flex;
+      gap: 16px;
+    }
+    .game-card {
+      padding: 24px 40px;
+      background: #16213e;
+      border-radius: 16px;
+      text-decoration: none;
+      color: #eee;
+      font-size: 1.1rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .game-card:hover {
+      background: #0f3460;
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+<body>
+  <h1>GAMES</h1>
+  <div class="games">
+    <a href="hangman.html" class="game-card">Hangman</a>
+    <a href="tictactoe.html" class="game-card">Tic Tac Toe</a>
+  </div>
+</body>
+</html>
