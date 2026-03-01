@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Table Tennis</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      letter-spacing: 4px;
+      margin-bottom: 20px;
+      color: #eee;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #8b8fa8;
+      background: #16213e;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+
+    .nav-link:hover {
+      background: #0f3460;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background: #e94560;
+      color: #fff;
+    }
+
+    .game-container {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 24px 28px 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    canvas {
+      border-radius: 10px;
+      display: block;
+      max-width: 100%;
+      cursor: none;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .controls label {
+      font-size: 0.9rem;
+      color: #8b8fa8;
+    }
+
+    .controls input[type="text"] {
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 2px solid #0f3460;
+      background: #0d1b2a;
+      color: #fff;
+      font-size: 0.95rem;
+      width: 160px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .controls input[type="text"]:focus {
+      border-color: #e94560;
+    }
+
+    .btn {
+      padding: 8px 22px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-primary { background: #e94560; color: #fff; }
+    .btn-primary:hover { background: #c73652; transform: scale(1.05); }
+    .btn-secondary { background: #0f3460; color: #eee; }
+    .btn-secondary:hover { background: #1a4a82; transform: scale(1.05); }
+
+    .subtle {
+      font-size: 0.82rem;
+      color: #8b8fa8;
+      text-align: center;
+    }
+
+    .leaderboard {
+      margin-top: 28px;
+      background: #16213e;
+      border-radius: 16px;
+      padding: 20px 28px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .leaderboard h2 {
+      font-size: 1.1rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #ffd700;
+      margin-bottom: 14px;
+      text-align: center;
+    }
+
+    .leaderboard table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .leaderboard th {
+      color: #8b8fa8;
+      font-weight: 600;
+      padding: 4px 8px;
+      text-align: left;
+      border-bottom: 1px solid #0f3460;
+    }
+
+    .leaderboard td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #0f3460;
+    }
+
+    .leaderboard tr:last-child td { border-bottom: none; }
+
+    .leaderboard .rank { color: #8b8fa8; width: 30px; }
+    .leaderboard .wins { color: #2ea043; font-weight: bold; }
+    .leaderboard .losses { color: #e94560; }
+
+    .lb-empty {
+      text-align: center;
+      color: #8b8fa8;
+      font-size: 0.85rem;
+      padding: 12px 0;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="hangman.html" class="nav-link">Hangman</a>
+  <a href="tictactoe.html" class="nav-link">Tic Tac Toe</a>
+  <a href="tabletennis.html" class="nav-link active">Table Tennis</a>
+</nav>
+
+<h1>TABLE TENNIS</h1>
+
+<div class="game-container">
+  <canvas id="canvas" width="700" height="420"></canvas>
+  <div class="controls">
+    <label for="name-input">Name:</label>
+    <input id="name-input" type="text" maxlength="16" placeholder="Your name" value="Player" />
+    <button class="btn btn-primary" id="start-btn">Start Game</button>
+    <button class="btn btn-secondary" id="clear-lb-btn">Clear Leaderboard</button>
+  </div>
+  <div class="subtle">Move mouse over canvas to control paddle &nbsp;·&nbsp; W/S or Arrow keys also work</div>
+</div>
+
+<div class="leaderboard">
+  <h2>Leaderboard</h2>
+  <table>
+    <thead>
+      <tr>
+        <th class="rank">#</th>
+        <th>Name</th>
+        <th class="wins">W</th>
+        <th class="losses">L</th>
+      </tr>
+    </thead>
+    <tbody id="lb-body"></tbody>
+  </table>
+</div>
+
+<script>
+  // ── Constants ──────────────────────────────────────────────────────────────
+  const W = 700, H = 420;
+  const PW = 14, PH = 80;
+  const BR = 7;
+  const WIN_SCORE = 7;
+  const BASE_SPD = 5.5, MAX_SPD = 12;
+  const AI_SPD = 4.2;
+  const KEY_SPD = 7;
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let state = 'waiting'; // waiting | playing | scored | gameover
+  let pScore = 0, cpuScore = 0;
+  let winner = null, lastScorer = null;
+  let scoredTimer = 0, flashAlpha = 0;
+  let ballSpd = BASE_SPD;
+
+  const pad  = { x: 24,       y: H/2 - PH/2, w: PW, h: PH };
+  const cpu  = { x: W-24-PW, y: H/2 - PH/2, w: PW, h: PH };
+  const ball = { x: W/2, y: H/2, vx: 0, vy: 0 };
+
+  // ── Canvas ─────────────────────────────────────────────────────────────────
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // ── Audio ──────────────────────────────────────────────────────────────────
+  let audio;
+  function initAudio() {
+    if (!audio) audio = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  function beep(freq, dur, vol = 0.1, type = 'square') {
+    if (!audio) return;
+    try {
+      const osc = audio.createOscillator();
+      const g = audio.createGain();
+      osc.connect(g); g.connect(audio.destination);
+      osc.type = type; osc.frequency.value = freq;
+      g.gain.setValueAtTime(vol, audio.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, audio.currentTime + dur);
+      osc.start(); osc.stop(audio.currentTime + dur);
+    } catch (e) {}
+  }
+
+  // ── Input ──────────────────────────────────────────────────────────────────
+  const keys = {};
+  let mouseY = H / 2, mouseActive = false;
+
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    mouseY = (e.clientY - r.top) * (H / r.height);
+    mouseActive = true;
+  });
+  canvas.addEventListener('mouseleave', () => mouseActive = false);
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const r = canvas.getBoundingClientRect();
+    mouseY = (e.touches[0].clientY - r.top) * (H / r.height);
+    mouseActive = true;
+    initAudio();
+  }, { passive: false });
+  document.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (['ArrowUp', 'ArrowDown'].includes(e.key)) e.preventDefault();
+  });
+  document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  function resetBall(dir) {
+    ball.x = W / 2;
+    ball.y = H / 2 + (Math.random() * 40 - 20);
+    ballSpd = BASE_SPD;
+    const a = Math.random() * 0.4 - 0.2;
+    ball.vx = dir * ballSpd * Math.cos(a);
+    ball.vy = ballSpd * Math.sin(a);
+  }
+
+  // ── Leaderboard ────────────────────────────────────────────────────────────
+  function getLB() {
+    try { return JSON.parse(localStorage.getItem('tt_lb') || '[]'); } catch { return []; }
+  }
+  function addResult(name, won) {
+    const lb = getLB();
+    let e = lb.find(x => x.name === name);
+    if (!e) { e = { name, wins: 0, losses: 0 }; lb.push(e); }
+    won ? e.wins++ : e.losses++;
+    localStorage.setItem('tt_lb', JSON.stringify(lb));
+    renderLB();
+  }
+  function renderLB() {
+    const lb = getLB().sort((a, b) => b.wins - a.wins || a.losses - b.losses).slice(0, 8);
+    const body = document.getElementById('lb-body');
+    if (!lb.length) {
+      body.innerHTML = '<tr><td colspan="4" class="lb-empty">No games played yet</td></tr>';
+      return;
+    }
+    body.innerHTML = lb.map((e, i) => `<tr>
+      <td class="rank">${i + 1}</td>
+      <td>${e.name}</td>
+      <td class="wins">${e.wins}</td>
+      <td class="losses">${e.losses}</td>
+    </tr>`).join('');
+  }
+
+  // ── Game Logic ─────────────────────────────────────────────────────────────
+  function startGame() {
+    initAudio();
+    pScore = 0; cpuScore = 0; winner = null; lastScorer = null;
+    pad.y = H / 2 - PH / 2;
+    cpu.y = H / 2 - PH / 2;
+    resetBall(Math.random() > 0.5 ? 1 : -1);
+    state = 'playing';
+  }
+
+  function onScore(scorer) {
+    lastScorer = scorer;
+    flashAlpha = 1;
+    beep(scorer === 'player' ? 660 : 220, 0.25, 0.15, 'sine');
+    if (pScore >= WIN_SCORE || cpuScore >= WIN_SCORE) {
+      winner = pScore >= WIN_SCORE ? 'player' : 'cpu';
+      state = 'gameover';
+      const name = document.getElementById('name-input').value.trim() || 'Player';
+      addResult(name, winner === 'player');
+      beep(winner === 'player' ? 880 : 110, 0.7, 0.18, 'sine');
+    } else {
+      state = 'scored';
+      scoredTimer = 75;
+    }
+  }
+
+  function updatePad() {
+    if (mouseActive) pad.y = mouseY - PH / 2;
+    if (keys['w'] || keys['W'] || keys['ArrowUp'])   pad.y -= KEY_SPD;
+    if (keys['s'] || keys['S'] || keys['ArrowDown']) pad.y += KEY_SPD;
+    pad.y = clamp(pad.y, 0, H - PH);
+  }
+
+  function updateCPU() {
+    const target = ball.y - PH / 2 + (Math.random() * 10 - 5);
+    const diff = target - cpu.y;
+    const spd = ball.vx > 0 ? AI_SPD : AI_SPD * 0.6;
+    cpu.y += clamp(diff, -spd, spd);
+    cpu.y = clamp(cpu.y, 0, H - PH);
+  }
+
+  function hitPaddle(paddle, dir) {
+    const rel = (ball.y - (paddle.y + PH / 2)) / (PH / 2);
+    const angle = rel * (Math.PI / 3.5);
+    ballSpd = clamp(ballSpd + 0.4, BASE_SPD, MAX_SPD);
+    ball.vx = dir * ballSpd * Math.cos(angle);
+    ball.vy = ballSpd * Math.sin(angle);
+    beep(400 + rel * 100, 0.04, 0.1);
+  }
+
+  function updateBall() {
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    // Wall bounce
+    if (ball.y - BR < 0) { ball.y = BR;     ball.vy =  Math.abs(ball.vy); beep(300, 0.03, 0.06); }
+    if (ball.y + BR > H) { ball.y = H - BR; ball.vy = -Math.abs(ball.vy); beep(300, 0.03, 0.06); }
+
+    // Player paddle hit
+    if (ball.vx < 0 &&
+        ball.x - BR <= pad.x + pad.w && ball.x + BR >= pad.x &&
+        ball.y + BR >= pad.y          && ball.y - BR <= pad.y + PH) {
+      ball.x = pad.x + pad.w + BR;
+      hitPaddle(pad, 1);
+    }
+
+    // CPU paddle hit
+    if (ball.vx > 0 &&
+        ball.x + BR >= cpu.x          && ball.x - BR <= cpu.x + cpu.w &&
+        ball.y + BR >= cpu.y          && ball.y - BR <= cpu.y + PH) {
+      ball.x = cpu.x - BR;
+      hitPaddle(cpu, -1);
+    }
+
+    // Scoring
+    if      (ball.x + BR < 0) { cpuScore++; onScore('cpu');    }
+    else if (ball.x - BR > W) { pScore++;   onScore('player'); }
+  }
+
+  // ── Update ─────────────────────────────────────────────────────────────────
+  function update() {
+    if (state === 'playing') {
+      updatePad(); updateCPU(); updateBall();
+    } else if (state === 'scored') {
+      updatePad(); updateCPU();
+      flashAlpha = Math.max(0, flashAlpha - 0.025);
+      if (--scoredTimer <= 0) {
+        resetBall(lastScorer === 'player' ? 1 : -1);
+        state = 'playing';
+      }
+    }
+  }
+
+  // ── Draw ───────────────────────────────────────────────────────────────────
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);     ctx.quadraticCurveTo(x + w, y,     x + w, y + r);
+    ctx.lineTo(x + w, y + h - r); ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);     ctx.quadraticCurveTo(x,     y + h, x,     y + h - r);
+    ctx.lineTo(x, y + r);         ctx.quadraticCurveTo(x,     y,     x + r, y);
+    ctx.closePath();
+  }
+
+  function draw() {
+    // Background
+    ctx.fillStyle = '#0d1b2a';
+    ctx.fillRect(0, 0, W, H);
+
+    // Table border
+    ctx.save();
+    ctx.strokeStyle = '#1e4060';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(5, 5, W - 10, H - 10);
+    ctx.restore();
+
+    // Net
+    ctx.save();
+    ctx.setLineDash([6, 8]);
+    ctx.strokeStyle = '#2a4a6a';
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#3a6a9a';
+    ctx.fillRect(W / 2 - 4, 0, 8, 14);
+    ctx.fillRect(W / 2 - 4, H - 14, 8, 14);
+    ctx.restore();
+
+    // Screen flash on score
+    if (flashAlpha > 0 && lastScorer) {
+      ctx.save();
+      ctx.globalAlpha = flashAlpha * 0.14;
+      ctx.fillStyle = lastScorer === 'player' ? '#2ea043' : '#e94560';
+      ctx.fillRect(0, 0, W, H);
+      ctx.restore();
+    }
+
+    // Paddles
+    ctx.save();
+    ctx.shadowBlur = 16;
+    ctx.fillStyle = '#e94560'; ctx.shadowColor = '#e94560';
+    roundRect(pad.x, pad.y, pad.w, pad.h, 6); ctx.fill();
+    ctx.fillStyle = '#2ea043'; ctx.shadowColor = '#2ea043';
+    roundRect(cpu.x, cpu.y, cpu.w, cpu.h, 6); ctx.fill();
+    ctx.restore();
+
+    // Ball
+    if (state !== 'waiting') {
+      ctx.save();
+      ctx.fillStyle = '#fff'; ctx.shadowColor = '#fff'; ctx.shadowBlur = 18;
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, BR, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    }
+
+    // Score + names
+    if (state !== 'waiting') {
+      const pName = (document.getElementById('name-input').value.trim() || 'Player').slice(0, 12).toUpperCase();
+      ctx.save();
+      ctx.font = 'bold 44px Segoe UI, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      ctx.textAlign = 'right'; ctx.fillText(pScore,    W/2 - 40, 60);
+      ctx.textAlign = 'left';  ctx.fillText(cpuScore,  W/2 + 40, 60);
+      ctx.font = '12px Segoe UI, sans-serif';
+      ctx.fillStyle = 'rgba(160,185,210,0.6)';
+      ctx.textAlign = 'right'; ctx.fillText(pName,      W/2 - 56, 76);
+      ctx.textAlign = 'left';  ctx.fillText('COMPUTER', W/2 + 56, 76);
+      ctx.restore();
+    }
+
+    // "POINT!" flash text
+    if (state === 'scored' && flashAlpha > 0.1) {
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, flashAlpha * 2.2);
+      ctx.font = 'bold 26px Segoe UI, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = lastScorer === 'player' ? '#2ea043' : '#e94560';
+      ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 14;
+      ctx.fillText(lastScorer === 'player' ? 'POINT!' : 'COMPUTER SCORES', W / 2, H / 2);
+      ctx.restore();
+    }
+
+    // Overlay: waiting or gameover
+    if (state === 'waiting' || state === 'gameover') {
+      ctx.save();
+      ctx.fillStyle = 'rgba(8,16,28,0.82)';
+      ctx.fillRect(0, 0, W, H);
+      ctx.textAlign = 'center';
+      if (state === 'waiting') {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 36px Segoe UI, sans-serif';
+        ctx.fillText('TABLE TENNIS', W / 2, H / 2 - 16);
+        ctx.fillStyle = 'rgba(160,185,210,0.7)';
+        ctx.font = '16px Segoe UI, sans-serif';
+        ctx.fillText('Enter your name and press Start Game', W / 2, H / 2 + 20);
+      } else {
+        const pName = document.getElementById('name-input').value.trim() || 'Player';
+        const isWin = winner === 'player';
+        ctx.fillStyle = isWin ? '#ffd700' : '#e94560';
+        ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = 22;
+        ctx.font = 'bold 36px Segoe UI, sans-serif';
+        ctx.fillText(isWin ? pName.toUpperCase() + ' WINS!' : 'COMPUTER WINS!', W / 2, H / 2 - 14);
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(160,185,210,0.75)';
+        ctx.font = '17px Segoe UI, sans-serif';
+        ctx.fillText(pScore + ' \u2013 ' + cpuScore + '   \u00b7   Press Start Game to play again', W / 2, H / 2 + 24);
+      }
+      ctx.restore();
+    }
+  }
+
+  // ── Loop ───────────────────────────────────────────────────────────────────
+  function loop() { update(); draw(); requestAnimationFrame(loop); }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  document.getElementById('start-btn').addEventListener('click', startGame);
+  document.getElementById('clear-lb-btn').addEventListener('click', () => {
+    if (confirm('Clear the leaderboard?')) {
+      localStorage.removeItem('tt_lb');
+      renderLB();
+    }
+  });
+
+  renderLB();
+  loop();
+</script>
+
+</body>
+</html>
