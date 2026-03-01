@@ -18,6 +18,35 @@
       padding: 20px;
     }
 
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #8b8fa8;
+      background: #16213e;
+      transition: background 0.15s, color 0.15s, transform 0.1s;
+    }
+
+    .nav-link:hover {
+      background: #0f3460;
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .nav-link.active {
+      background: #e94560;
+      color: #fff;
+    }
+
     h1 {
       font-size: 2rem;
       letter-spacing: 4px;
@@ -171,6 +200,11 @@
   </style>
 </head>
 <body>
+
+<nav class="nav">
+  <a href="hangman.html" class="nav-link active">Hangman</a>
+  <a href="tictactoe.html" class="nav-link">Tic Tac Toe</a>
+</nav>
 
 <h1>HANGMAN</h1>
 
